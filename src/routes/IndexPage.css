@@ -1,0 +1,31 @@
+
+.header_nav{
+  height: 48px;
+  width: 100%;
+  background: #0593d3;
+}
+.my_name{
+  float: left;
+  height:48px;
+  line-height: 48px;
+  font-size: 24px;
+  padding: 0 30px;
+  background: #0593d3;
+  color: #fff;
+}
+.tab_ul{
+  height: 48px;
+}
+.tab_li{
+  float: left;
+  line-height: 48px;
+  cursor: pointer;
+}
+.tab_li a{
+  font-size: 14px;
+  color: #fff;
+  padding: 0 15px;
+}
+.tab_li:hover{
+  background: #0482ba;
+}
