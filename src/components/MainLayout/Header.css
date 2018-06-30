@@ -1,0 +1,23 @@
+
+.top{
+  width: 100%;
+  background: #0593d3;
+}
+.topNav{
+  float: left;
+  height: 48px;
+  line-height: 48px;
+  color: #fff;
+  font-size: 24px;
+}
+.topNavLeft{
+  padding: 0 20px;
+}
+.topNavRight{
+  margin: 0;
+}
+.topNavRight li{
+  float: left;
+  padding: 0 20px;
+  font-size: 14px;
+}
