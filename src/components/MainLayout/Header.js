@@ -1,24 +1,17 @@
 import React from 'react';
-import { Menu } from 'antd';
-import { Link } from 'dva/router';
 import styles from './Header.css';
-// import { API, URI } from '../../utils/api';
+import { API, URI } from '../../utils/api';
 class Header extends React.Component {
   state = {
-    list: [
-      {
-        title: '编程',
-      },
-      {
-        title: '读书',
-      },
-      {
-        title: '健身',
-      },
-      {
-        title: '旅游',
-      }
-    ]
+    list: []
+  }
+  componentDidMount = () => {
+    API.get(URI.Topic.Category).then((response) => {
+      console.log(response)
+      this.setState({
+        list: response.data,
+      })
+    })
   }
   render () {
     return (
@@ -31,7 +24,7 @@ class Header extends React.Component {
             this.state.list.map((item, index) => {
               return (
                 <li key={index}>
-                  {item.title}
+                  {item.name}
                 </li>
               )
             })
