@@ -6,12 +6,20 @@ class Header extends React.Component {
     list: []
   }
   componentDidMount = () => {
-    API.get(URI.Topic.Category).then((response) => {
-      console.log(response)
-      this.setState({
-        list: response.data,
+    const categories = localStorage.getItem('categories');
+    if (!categories) {
+      API.get(URI.Topic.Category).then((response) => {
+        this.setState({
+          list: response.data,
+        }, () => {
+          localStorage.setItem('categories', JSON.stringify(response.data));
+        })
       })
-    })
+    } else {
+      this.setState({
+        list: JSON.parse(categories),
+      })
+    }
   }
   render () {
     return (

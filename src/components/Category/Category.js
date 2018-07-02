@@ -23,6 +23,15 @@ class Category extends React.Component {
       })
     })
   }
+  goTopicDetails = () => {
+    console.log('sds')
+    this.props.dispatch({
+      type: 'route/redirect',
+      payload: {
+        Msg: {},
+      },
+    });
+  }
   render () {
     return (
       <div className={styles.content}>
@@ -41,6 +50,7 @@ class Category extends React.Component {
               key={item.title}
               actions={[<IconText type="star-o" text="0" />, <IconText type="like-o" text="0" />, <IconText type="message" text={item.reply_count} />]}
               extra={<img width={272} alt="logo" src={item.img} />}
+              onClick={this.goTopicDetails}
             >
               <List.Item.Meta
                 avatar={<Avatar src={item.avatar} />}
@@ -58,6 +68,7 @@ class Category extends React.Component {
 
 function mapStateToProps(state) {
   return {
+    route: state.route,
   };
 }
 
