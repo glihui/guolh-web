@@ -14,14 +14,36 @@ class TopicDetails extends React.Component {
     loadingMore: false,
     showLoadingMore: true,
     data: [],
+    detailsData: {},
   }
-  componentDidMount() {
+  componentDidMount = () => {
     this.getData((res) => {
       this.setState({
         loading: false,
         data: res.results,
       });
     });
+
+    console.log(this.props.topicDetails)
+    if (this.props.topicDetails.Msg.id) {
+      localStorage.setItem('topicId', this.props.topicDetails.Msg.id);
+    }
+
+    this.getTopicDetails(this.props.topicDetails.Msg.id)
+  }
+  getTopicDetails = (id) => {
+    let idValue = id;
+    if (idValue) {
+
+    } else {
+      idValue = localStorage.getItem('topicId');
+    }
+    API.get(`${URI.Topic.Topic}/${idValue}?include=user,category`).then((response) => {
+      console.log(response)
+      this.setState({
+        detailsData: response,
+      })
+    })
   }
   getData = (callback) => {
     reqwest({
@@ -61,8 +83,8 @@ class TopicDetails extends React.Component {
     ) : null;
     return (
       <div>
-        <h1 className={styles.title}>标题</h1>
-        <p className={styles.content}>哈哈哈哈哈</p>
+        <h1 className={styles.title}>{this.state.detailsData.title}</h1>
+        <p className={styles.content}>{this.state.detailsData.body}</p>
         <List
           className="demo-loadmore-list"
           loading={loading}
@@ -87,6 +109,7 @@ class TopicDetails extends React.Component {
 
 function mapStateToProps(state) {
   return {
+    topicDetails: state.topicDetails,
   };
 }
 

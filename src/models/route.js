@@ -18,7 +18,8 @@ export default {
     },
     // 路由跳转
     * redirect ({ payload }, { put }) {
-      yield put(routerRedux.push('/details', {name: 'dkvirus', age: 20}));
+      console.log(payload)
+      yield put(routerRedux.push('/details', {name: 'dkvirus'}));
     },
   },
 

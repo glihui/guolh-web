@@ -23,12 +23,21 @@ class Category extends React.Component {
       })
     })
   }
-  goTopicDetails = () => {
-    console.log('sds')
+  goTopicDetails = (id) => {
     this.props.dispatch({
       type: 'route/redirect',
       payload: {
-        Msg: {},
+        Msg: {
+          id
+        },
+      },
+    });
+    this.props.dispatch({
+      type: 'topicDetails/saveId',
+      payload: {
+        Msg: {
+          id
+        },
       },
     });
   }
@@ -50,7 +59,7 @@ class Category extends React.Component {
               key={item.title}
               actions={[<IconText type="star-o" text="0" />, <IconText type="like-o" text="0" />, <IconText type="message" text={item.reply_count} />]}
               extra={<img width={272} alt="logo" src={item.img} />}
-              onClick={this.goTopicDetails}
+              onClick={this.goTopicDetails.bind(null,item.id)}
             >
               <List.Item.Meta
                 avatar={<Avatar src={item.avatar} />}
