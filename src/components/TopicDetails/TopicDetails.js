@@ -15,14 +15,16 @@ class TopicDetails extends React.Component {
     showLoadingMore: true,
     data: [],
     detailsData: {},
+    id:'',
+    repliesData: [],
   }
   componentDidMount = () => {
-    this.getData((res) => {
-      this.setState({
-        loading: false,
-        data: res.results,
-      });
-    });
+    // this.getData((res) => {
+    //   this.setState({
+    //     loading: false,
+    //     data: res.results,
+    //   });
+    // });
 
     console.log(this.props.topicDetails)
     if (this.props.topicDetails.Msg.id) {
@@ -38,6 +40,17 @@ class TopicDetails extends React.Component {
     } else {
       idValue = localStorage.getItem('topicId');
     }
+    this.setState({
+      id: idValue,
+    }, () => {
+      API.get(`${URI.Topic.Topic}/${this.state.id}/replies?include=user`).then((response) => {
+        console.log(response)
+        this.setState({
+          repliesData: response.data,
+          loading: false,
+        })
+      })
+    })
     API.get(`${URI.Topic.Topic}/${idValue}?include=user,category`).then((response) => {
       console.log(response)
       this.setState({
@@ -55,11 +68,17 @@ class TopicDetails extends React.Component {
         callback(res);
       },
     });
+
+
+
+
   }
   onLoadMore = () => {
     this.setState({
       loadingMore: true,
     });
+
+
     this.getData((res) => {
       const data = this.state.data.concat(res.results);
       this.setState({
@@ -74,11 +93,10 @@ class TopicDetails extends React.Component {
     });
   }
   render () {
-    const { loading, loadingMore, showLoadingMore, data } = this.state;
+    const { loading, loadingMore, showLoadingMore, data, repliesData } = this.state;
     const loadMore = showLoadingMore ? (
       <div style={{ textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px' }}>
         {loadingMore && <Spin />}
-        {!loadingMore && <Button onClick={this.onLoadMore}>loading more</Button>}
       </div>
     ) : null;
     return (
@@ -90,15 +108,14 @@ class TopicDetails extends React.Component {
           loading={loading}
           itemLayout="horizontal"
           loadMore={loadMore}
-          dataSource={data}
+          dataSource={repliesData}
           renderItem={item => (
-            <List.Item actions={[<a>edit</a>, <a>more</a>]}>
+            <List.Item>
               <List.Item.Meta
-                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                title={<a href="https://ant.design">{item.name.last}</a>}
-                description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                avatar={<Avatar src={item.user.avatar} />}
+                title={<a href="https://ant.design">{item.user.name}</a>}
+                description={item.content}
               />
-              <div>content</div>
             </List.Item>
           )}
         />
