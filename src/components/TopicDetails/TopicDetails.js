@@ -1,12 +1,10 @@
 import React from 'react';
 import { connect } from 'dva';
 import styles from './TopicDetails.css';
-import { List, Avatar, Button, Spin } from 'antd';
+import { List, Avatar, Button, Spin, Tag, Modal, Input, message } from 'antd';
 import { API, URI } from '../../utils/api';
 
-import reqwest from 'reqwest';
-
-const fakeDataUrl = 'https://randomuser.me/api/?results=5&inc=name,gender,email,nat&noinfo';
+const { TextArea } = Input;
 
 class TopicDetails extends React.Component {
   state = {
@@ -17,14 +15,11 @@ class TopicDetails extends React.Component {
     detailsData: {},
     id:'',
     repliesData: [],
+    loadingComment: false,
+    visible: false,
+    commentContent: '',
   }
   componentDidMount = () => {
-    // this.getData((res) => {
-    //   this.setState({
-    //     loading: false,
-    //     data: res.results,
-    //   });
-    // });
     if (this.props.topicDetails.Msg.id) {
       localStorage.setItem('topicId', this.props.topicDetails.Msg.id);
     }
@@ -54,42 +49,56 @@ class TopicDetails extends React.Component {
       })
     })
   }
-  getData = (callback) => {
-    reqwest({
-      url: fakeDataUrl,
-      type: 'json',
-      method: 'get',
-      contentType: 'application/json',
-      success: (res) => {
-        callback(res);
-      },
-    });
 
+  handleOk = () => {
+    console.log(this.props.Auth.User)
+    if (this.state.commentContent != '') {
+      this.setState({ loadingComment: true });
 
+      API.post(`${URI.Topic.Topic}/${this.state.id}/replies`,
+        {content: this.state.commentContent},
+        {Authorization: `Bearer ${this.props.Auth.User.meta.access_token}`})
+        .then((response) => {
+        console.log(response);
+        this.setState({ loadingComment: false, visible: false });
+
+        API.get(`${URI.Topic.Topic}/${this.state.id}/replies?include=user`).then((response) => {
+          this.setState({
+            repliesData: response.data,
+          })
+        })
+      })
+    } else {
+      message.error('评论内容不能为空');
+    }
 
 
   }
-  onLoadMore = () => {
+
+  handleCancel = () => {
+    this.setState({ visible: false });
+  }
+  buildInputField = (fieldName) => {
+    return {
+      value: this.state[fieldName],
+      onChange: (e) => {
+        this.setState({ [fieldName]: e.target.value });
+      }
+    }
+  }
+  comment = () => {
+    if (this.props.Auth.User.id) {
+
+    } else {
+      message.error('登录后才能评论');
+      return false;
+    }
     this.setState({
-      loadingMore: true,
-    });
-
-
-    this.getData((res) => {
-      const data = this.state.data.concat(res.results);
-      this.setState({
-        data,
-        loadingMore: false,
-      }, () => {
-        // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-        // In real scene, you can using public method of react-virtualized:
-        // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-        window.dispatchEvent(new Event('resize'));
-      });
+      visible: true,
     });
   }
   render () {
-    const { loading, loadingMore, showLoadingMore, data, repliesData } = this.state;
+    const { loading, loadingMore, showLoadingMore, data, repliesData, loadingComment, visible } = this.state;
     const loadMore = showLoadingMore ? (
       <div style={{ textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px' }}>
         {loadingMore && <Spin />}
@@ -99,6 +108,7 @@ class TopicDetails extends React.Component {
       <div>
         <h1 className={styles.title}>{this.state.detailsData.title}</h1>
         <p className={styles.content}>{this.state.detailsData.body}</p>
+        <Tag color="#2db7f5" onClick={this.comment}>评论</Tag>
         <List
           className="demo-loadmore-list"
           loading={loading}
@@ -115,6 +125,20 @@ class TopicDetails extends React.Component {
             </List.Item>
           )}
         />
+        <Modal
+          visible={visible}
+          title="评论"
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          footer={[
+            <Button key="back" onClick={this.handleCancel}>取消</Button>,
+            <Button key="submit" type="primary" loading={loadingComment} onClick={this.handleOk}>
+              提交
+            </Button>,
+          ]}
+        >
+          <TextArea rows={4} {...this.buildInputField('commentContent')}/>
+        </Modal>
       </div>
     );
   }
@@ -123,6 +147,7 @@ class TopicDetails extends React.Component {
 function mapStateToProps(state) {
   return {
     topicDetails: state.topicDetails,
+    Auth: state.Auth,
   };
 }
 

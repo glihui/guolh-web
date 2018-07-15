@@ -21,7 +21,11 @@ export default {
     *load({ payload }, { put }) {
       const response = yield API.get(URI.Auth.Me, {}, {Authorization: `Bearer ${payload.token}`});
       if (response.id) {
-        yield put({ type: 'saveMsg', payload: {User: response} });
+        let tmpData = response;
+        tmpData.meta = {access_token: payload.token}
+        yield put({ type: 'save', payload: {User: tmpData} });
+      } else {
+        yield put({ type: 'save', payload: {User: {}} });
       }
     },
     *saveUser({ payload: { User }}, { put }) {

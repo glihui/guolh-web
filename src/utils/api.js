@@ -32,8 +32,8 @@ export const API = {
   get: async (uri, params, headers) => {
     return Ajax.get(config.SERVER_URI + uri, params, headers);
   },
-  post: async (uri, params) => {
-    return Ajax.post(config.SERVER_URI + uri, params);
+  post: async (uri, params, headers) => {
+    return Ajax.post(config.SERVER_URI + uri, params, headers);
   },
   put: async (uri, params) => {
     return Ajax.put(config.SERVER_URI + uri, params);
