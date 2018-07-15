@@ -14,8 +14,8 @@ class Header extends React.Component {
   componentDidMount = () => {
 
     // 获取个人信息
-    const usermsg = JSON.parse(localStorage.getItem('user'));
-    if (usermsg.id) {
+    const usermsg = localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'));
+    if (usermsg && usermsg.id) {
       this.props.dispatch({
         type: 'Auth/load',
         payload: {
