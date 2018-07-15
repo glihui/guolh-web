@@ -6,6 +6,7 @@ function parseJSON(response) {
 }
 
 function checkStatus(response) {
+  return response;
   if ((response.status >= 200 && response.status < 300) || response.status == 0) {
     return response;
   }
@@ -120,7 +121,10 @@ export class Ajax {
     return request(`${uri}${breakSign}${args}`, {
       credentials: 'include',
       mode: 'cors',
-      headers,
+      headers: {
+        ...headers,
+      },
+
     });
   }
 

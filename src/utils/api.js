@@ -6,10 +6,10 @@ import config from '../config';
 
 export const URI = {
   Auth: {
-    Login: '/auth/login',
-    Register: '/auth/register',
+    Login: '/authorizations',
+    Register: '/register',
     Logout: '/auth/logout',
-    Me: '/auth/me',
+    Me: '/user',
   },
   User: {
     Token: '/user/qiniu',
@@ -29,8 +29,8 @@ export const URI = {
 };
 
 export const API = {
-  get: async (uri, params) => {
-    return Ajax.get(config.SERVER_URI + uri, params);
+  get: async (uri, params, headers) => {
+    return Ajax.get(config.SERVER_URI + uri, params, headers);
   },
   post: async (uri, params) => {
     return Ajax.post(config.SERVER_URI + uri, params);

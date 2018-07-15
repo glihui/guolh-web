@@ -25,8 +25,6 @@ class TopicDetails extends React.Component {
     //     data: res.results,
     //   });
     // });
-
-    console.log(this.props.topicDetails)
     if (this.props.topicDetails.Msg.id) {
       localStorage.setItem('topicId', this.props.topicDetails.Msg.id);
     }
@@ -44,7 +42,6 @@ class TopicDetails extends React.Component {
       id: idValue,
     }, () => {
       API.get(`${URI.Topic.Topic}/${this.state.id}/replies?include=user`).then((response) => {
-        console.log(response)
         this.setState({
           repliesData: response.data,
           loading: false,
@@ -52,7 +49,6 @@ class TopicDetails extends React.Component {
       })
     })
     API.get(`${URI.Topic.Topic}/${idValue}?include=user,category`).then((response) => {
-      console.log(response)
       this.setState({
         detailsData: response,
       })
