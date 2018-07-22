@@ -38,8 +38,8 @@ export const API = {
   put: async (uri, params) => {
     return Ajax.put(config.SERVER_URI + uri, params);
   },
-  delete: async (uri, params) => {
-    return Ajax.delete(config.SERVER_URI + uri, params);
+  delete: async (uri, params, headers) => {
+    return Ajax.delete(config.SERVER_URI + uri, params, headers);
   },
   open: (uri, params) => {
     const args = Ajax.buildParams(params);

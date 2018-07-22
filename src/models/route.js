@@ -18,8 +18,10 @@ export default {
     },
     // 路由跳转
     * redirect ({ payload }, { put }) {
-      console.log(payload)
       yield put(routerRedux.push('/details', {name: 'dkvirus'}));
+    },
+    * redirectIndex ({ payload }, { put }) {
+      yield put(routerRedux.push('/', {name: 'dkvirus'}));
     },
   },
 

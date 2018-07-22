@@ -23,7 +23,6 @@ class TopicDetails extends React.Component {
     if (this.props.topicDetails.Msg.id) {
       localStorage.setItem('topicId', this.props.topicDetails.Msg.id);
     }
-
     this.getTopicDetails(this.props.topicDetails.Msg.id)
   }
   getTopicDetails = (id) => {

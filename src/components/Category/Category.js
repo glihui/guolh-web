@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'dva';
 import styles from './Category.css';
-import { List, Avatar, Icon } from 'antd';
+import { List, Avatar, Icon, message } from 'antd';
 import { API, URI } from '../../utils/api';
 
 
-const IconText = ({ type, text }) => (
+const IconText = ({ type, text, fun, isZan }) => (
   <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
+    <Icon type={type} style={{ marginRight: 8, color: isZan ? 'red': '' }} onClick={fun} />
     {text}
   </span>
 );
@@ -17,7 +17,6 @@ class Category extends React.Component {
   }
   componentDidMount() {
     API.get(`${URI.Topic.Topic}?include=user,category`).then((response) => {
-      console.log(response)
       this.setState({
         listData: response.data,
       })
@@ -41,6 +40,69 @@ class Category extends React.Component {
       },
     });
   }
+  // 点赞或取消点赞
+  goZan = (id,index,flag,e) => {
+    e.stopPropagation();
+    if (this.props.Auth.User.id) {
+      if (flag == 1) {
+        API.delete(`${URI.Topic.Topic}/${id}/zans`,
+          {},
+          {Authorization: `Bearer ${this.props.Auth.User.meta.access_token}`})
+          .then((response) => {
+            console.log(response);
+
+            if (response.ok == '1') {
+              let tmpData = {};
+              tmpData.data = this.props.topicList.data.data;
+              console.log(tmpData);
+              tmpData.data[index].is_zan = 0;
+              tmpData.data[index].zan_count = parseInt(tmpData.data[index].zan_count) - 1;
+              localStorage.setItem('categoriesList', JSON.stringify(tmpData));
+              this.props.dispatch({
+                type: 'topicList/saveData',
+                payload: {
+                  data: tmpData,
+                }
+              })
+            } else {
+              message.error(response.msg);
+            }
+
+
+          })
+      } else {
+        API.post(`${URI.Topic.Topic}/${id}/zans`,
+          {},
+          {Authorization: `Bearer ${this.props.Auth.User.meta.access_token}`})
+          .then((response) => {
+            console.log(response);
+
+            if (response.ok == '1') {
+              let tmpData = {};
+              tmpData.data = this.props.topicList.data.data;
+              console.log(tmpData);
+              tmpData.data[index].is_zan = 1;
+              tmpData.data[index].zan_count = parseInt(tmpData.data[index].zan_count) + 1;
+              localStorage.setItem('categoriesList', JSON.stringify(tmpData));
+              this.props.dispatch({
+                type: 'topicList/saveData',
+                payload: {
+                  data: tmpData,
+                }
+              })
+            } else {
+              message.error(response.msg);
+            }
+
+
+          })
+      }
+    } else {
+      message.error('登录后才能点赞');
+      return false;
+    }
+
+  }
   render () {
     return (
       <div className={styles.content}>
@@ -53,11 +115,11 @@ class Category extends React.Component {
             },
             pageSize: 5,
           }}
-          dataSource={this.state.listData}
-          renderItem={item => (
+          dataSource={this.props.topicList.data.data}
+          renderItem={(item, index) => (
             <List.Item
               key={item.title}
-              actions={[<IconText type="star-o" text="0" />, <IconText type="like-o" text="0" />, <IconText type="message" text={item.reply_count} />]}
+              actions={[<IconText isZan={item.is_zan} fun={this.goZan.bind(null, item.id, index, item.is_zan)} type="like-o" text={item.zan_count} />, <IconText type="message" text={item.reply_count} />]}
               extra={<img width={272} alt="logo" src={item.img} />}
               onClick={this.goTopicDetails.bind(null,item.id)}
             >
@@ -77,7 +139,9 @@ class Category extends React.Component {
 
 function mapStateToProps(state) {
   return {
+    Auth: state.Auth,
     route: state.route,
+    topicList: state.topicList,
   };
 }
 

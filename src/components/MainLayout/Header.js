@@ -10,6 +10,7 @@ class Header extends React.Component {
     userName: '',
     password: '',
     status:'0',
+    tabId: '',
   }
   componentDidMount = () => {
 
@@ -24,6 +25,28 @@ class Header extends React.Component {
       })
     }
     const categories = localStorage.getItem('categories');
+    const categoryId = localStorage.getItem('categoryId');
+    if (!categoryId) {
+      this.setState({
+        tabId: 1,
+      })
+      setTimeout(() => {
+        this.selectNav(1)
+      }, 500);
+
+    } else {
+      this.setState({
+        tabId: categoryId,
+      });
+      if (this.props.topicList.data.meta) {
+
+      } else {
+        setTimeout(() => {
+          this.selectNav(categoryId)
+        }, 500);
+
+      }
+    }
     if (!categories) {
       API.get(URI.Topic.Category).then((response) => {
         this.setState({
@@ -37,6 +60,7 @@ class Header extends React.Component {
         list: JSON.parse(categories),
       })
     }
+
   }
   showModal = (status) => {
     this.setState({
@@ -76,14 +100,32 @@ class Header extends React.Component {
             }
           })
           localStorage.setItem('user', JSON.stringify(response));
-        } else if (response.status_code == 422) {
+
+
+          const categoryId = localStorage.getItem('categoryId');
+          if (!categoryId) {
+            this.setState({
+              tabId: 1,
+            })
+            setTimeout(() => {
+              this.selectNav(1)
+            }, 500);
+
+          } else {
+            this.setState({
+              tabId: categoryId,
+            });
+            setTimeout(() => {
+              this.selectNav(categoryId)
+            }, 500);
+          }
+
+        } else {
           if (response.errors) {
             message.error(response.errors.password[0]);
           } else {
             message.error(response.message);
           }
-        } else {
-
         }
     })
   }
@@ -120,6 +162,52 @@ class Header extends React.Component {
       }
     })
     localStorage.setItem('user', JSON.stringify({}));
+
+    const categoryId = localStorage.getItem('categoryId');
+    if (!categoryId) {
+      this.setState({
+        tabId: 1,
+      })
+      setTimeout(() => {
+        this.selectNav(1)
+      }, 500);
+
+    } else {
+      this.setState({
+        tabId: categoryId,
+      });
+      setTimeout(() => {
+        this.selectNav(categoryId)
+      }, 500);
+    }
+  }
+  selectNav = (id) => {
+    this.setState({
+      tabId: id,
+    });
+    localStorage.setItem('categoryId', id);
+
+    let tmpJSon = {};
+    if (this.props.Auth.User.meta) {
+      tmpJSon = {Authorization: `Bearer ${this.props.Auth.User.meta.access_token}`}
+    }
+    API.get(`${URI.Topic.Category}/${id}`,{},tmpJSon).then((response) => {
+      localStorage.setItem('categoriesList', response);
+      this.props.dispatch({
+        type: 'topicList/saveData',
+        payload: {
+          data: response,
+        }
+      })
+    });
+    this.props.dispatch({
+      type: 'route/redirectIndex',
+      payload: {
+        Msg: {
+
+        },
+      },
+    });
   }
   render () {
     const { userName, password } = this.state;
@@ -134,7 +222,7 @@ class Header extends React.Component {
           {
             this.state.list.map((item, index) => {
               return (
-                <li key={index}>
+                <li key={index} className={this.state.tabId == item.id? styles.tabActive : ''} onClick={this.selectNav.bind(null, item.id)}>
                   {item.name}
                 </li>
               )
@@ -165,6 +253,7 @@ class Header extends React.Component {
             ref={node => this.userNameInput = node}
           />
           <Input
+            type='password'
             placeholder="输入您的密码"
             prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
             suffix={pwdSuffix}
@@ -182,6 +271,8 @@ class Header extends React.Component {
 function mapStateToProps(state) {
   return {
     Auth: state.Auth,
+    topicList: state.topicList,
+    route: state.route,
   }
 }
 

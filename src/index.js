@@ -12,6 +12,7 @@ app.use(createLoading());
 app.model(require('./models/route').default);
 app.model(require('./models/topicDetails').default);
 app.model(require('./models/Auth').default);
+app.model(require('./models/topicList').default);
 
 // 4. Router
 app.router(require('./router').default);
