@@ -216,7 +216,7 @@ class Header extends React.Component {
     return (
       <div className={styles.top}>
         <div className={`${styles.topNav} ${styles.topNavLeft}`}>
-          小辉的官方网站
+          love and dreams
         </div>
         <ul className={`${styles.topNav} ${styles.topNavRight}`}>
           {
